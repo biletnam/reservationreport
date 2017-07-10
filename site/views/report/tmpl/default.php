@@ -60,9 +60,18 @@ $posttext = $this->paramsMenuEntry->get("posttext");
 if (!empty($pretext)) {
 	echo replaceFields($pretext, $recordCount);
 }
+$headerDate = '';
+$dayStartTime = $this->paramsMenuEntry->get("daystarttime");
+if (empty($dayStartTime)) { $dayStartTime = '00:00'; }
 foreach ($records as $record) {
-	echo $record->date.",  ".$record->start_time." - ".$record->end_time.",   ".$record->message."<br/>\n";
+	if (($headerDate != $record->date) && ($record->start_time >= $dayStartTime)) {
+		if (!empty($headerDate)) { echo "</p>\n"; }
+		$headerDate = $record->date;
+		echo "<p><b>".$record->date."</b></br>\n";
+	}
+	echo $record->start_time." - ".$record->end_time." &nbsp; ".$record->message."<br/>\n";
 }
+if (!empty($headerDate)) { echo "</p>\n"; }
 if (!empty($posttext)) {
 	echo replaceFields($posttext, $recordCount);
 }
