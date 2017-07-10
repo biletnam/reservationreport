@@ -1,19 +1,69 @@
 <?php
-  mysql_connect($this->paramsMenuEntry->get("server"), $this->paramsMenuEntry->get("user"), $this->paramsMenuEntry->get("password"));
-  mysql_select_db($this->paramsMenuEntry->get("database"));
-  $res = mysql_query("select date_format(b.slot_date, '%d.%m.%Y') AS Datum,
-			SUBSTR(b.slot_time_from,1,5) AS von,
-			SUBSTR(b.slot_time_to,1,5) AS bis, 
-			a.reservation_message AS Guggenmusik 
- 			from booking_reservation AS a join booking_slots AS b on a.slot_id = b.slot_id 
-			where a.reservation_confirmed = '1' and a.reservation_cancelled = '0' order by Datum");
-  
-$num = mysql_num_rows($res);
-  echo "$num Guggen sind bis jetzt angemeldet...<br/><br/>";
+/**
+* @version	$Id$
+* @package	Joomla
+* @subpackage	Reservation
+* @copyright	Copyright (c) 2017 Norber Kuemin. All rights reserved.
+* @license	http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE
+* @author	Norber Kuemin
+* @authorEmail	momo_102@bluemail.ch
+*/
 
-  while($dsatz = mysql_fetch_assoc($res))
-  {
-    echo $dsatz ["Datum"] . ",  " . $dsatz["von"] . " - " . $dsatz["bis"] . ",   " . $dsatz["Guggenmusik"] ."<br/>";
-   }
+function replaceFields($text, $recordCount) {
+	return $text;
+}
+
+function getHandleForJoomlaDb() {
+	return JFactory::getDBO();
+}
+
+function getHandleForExternalDb($dbServer, $dbName, $dbUser, $dbPassword) {
+	$option['driver']   = 'mysql';            // Database driver name
+	$option['host']     = $dbServer;          // Database host name
+	$option['user']     = $dbUser;            // User for database authentication
+	$option['password'] = $dbPassword;        // Password for database authentication
+	$option['database'] = $dbName;            // Database name
+	$option['prefix']   = '';                 // Database prefix (may be empty)
+	return JDatabaseDriver::getInstance($option);
+}
+
+function getData($dbServer, $dbName, $dbUser, $dbPassword) {
+	if (empty($dbServer) && empty($dbName) && empty($dbUser) && empty($dbPassword)) {
+		$db = getHandleForJoomlaDb();
+	} else {
+		$db = getHandleForExternalDb($dbServer, $dbName, $dbUser, $dbPassword);
+	}
+	$query = $db->getQuery(true);
+	$fields = array("date_format(bs.slot_date, '%d.%m.%Y') AS date",
+		"SUBSTR(bs.slot_time_from,1,5) AS start_time",
+		"SUBSTR(bs.slot_time_to,1,5) AS end_time", 
+		"br.reservation_message AS message"
+	);
+	$query->select($fields)
+		->from($db->quoteName('booking_reservation','br'))
+		->join('LEFT', $db->quoteName('booking_slots', 'bs').' ON ('.$db->quoteName('br.slot_id').'='.$db->quoteName('bs.slot_id').')')
+		->where("br.reservation_confirmed = '1' and br.reservation_cancelled = '0'")
+		->order("bs.slot_date, bs.slot_time_from");
+	$db->setQuery($query);
+	return $db->loadObjectList();
+}
+
+// Get data from DB
+$records = getData($this->paramsMenuEntry->get("server"), $this->paramsMenuEntry->get("database"), $this->paramsMenuEntry->get("user"), $this->paramsMenuEntry->get("password"));
+
+// Get other data
+$recordCount = 0;
+$pretext = $this->paramsMenuEntry->get("pretext");
+$posttext = $this->paramsMenuEntry->get("posttext");
+
+// Output
+if (!empty($pretext)) {
+	echo replaceFields($pretext, $recordCount);
+}
+foreach ($records as $record) {
+	echo $record->date.",  ".$record->start_time." - ".$record->end_time.",   ".$record->message."<br/>\n";
+}
+if (!empty($posttext)) {
+	echo replaceFields($posttext, $recordCount);
+}
 ?>
-

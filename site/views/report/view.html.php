@@ -3,10 +3,10 @@
 * @version	$Id$
 * @package	Joomla
 * @subpackage	Reservation
-* @copyright	Copyright (c) 2014 Martin Mooser. All rights reserved.
+* @copyright	Copyright (c) 2017 Norber Kuemin. All rights reserved.
 * @license	http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE
-* @author	Martin Mooser
-* @authorEmail	m.mooser@bluewin.ch
+* @author	Norber Kuemin
+* @authorEmail	momo_102@bluemail.ch
 */
 
 // Check to ensure this file is included in Joomla!
