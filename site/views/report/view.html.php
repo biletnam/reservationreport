@@ -10,7 +10,7 @@
 */
 
 // Check to ensure this file is included in Joomla!
-defined('_JEXEC') or die;
+defined('_JEXEC') or die('Restricted access');
 
 class ReservationReportViewReport extends JViewLegacy {
 	protected $item;

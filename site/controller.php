@@ -9,7 +9,7 @@
 * @authorEmail	momo_102@bluemail.ch
 */
 
-// No direct access to this file
+// Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die('Restricted access');
  
 // import Joomla controller library

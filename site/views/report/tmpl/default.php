@@ -9,6 +9,9 @@
 * @authorEmail	momo_102@bluemail.ch
 */
 
+// Check to ensure this file is included in Joomla!
+defined('_JEXEC') or die('Restricted access');
+
 function replaceFields($text, $recordCount) {
 	return $text;
 }
